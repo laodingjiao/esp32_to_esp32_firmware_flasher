@@ -62,8 +62,17 @@ esp32_firmware_flasher/
 │   ├── test_verifier.py               # 烧后验证测试 (9 个)
 │   ├── test_stub_loader.py            # stub loader 测试 (7 个)
 │   └── test_chip_detection.py         # 芯片检测测试 (14 个)
-├── stub/                              # stub loader 目录 (ESP32 stub, 5 KB)
-│   └── esp32_stub.json                #   ESP32 stub (3.6 KB)
+├── stub/                              # stub loader 目录 (10 种芯片, 66 KB)
+│   ├── esp32_stub.json                #   ESP32 stub (3.6 KB)
+│   ├── esp32s2_stub.json              #   ESP32-S2 stub (4.8 KB)
+│   ├── esp32s3_stub.json              #   ESP32-S3 stub (6.2 KB)
+│   ├── esp32c2_stub.json              #   ESP32-C2 stub (3.7 KB)
+│   ├── esp32c3_stub.json              #   ESP32-C3 stub (4.1 KB)
+│   ├── esp32c5_stub.json              #   ESP32-C5 stub (5.4 KB)
+│   ├── esp32c6_stub.json              #   ESP32-C6 stub (4.1 KB)
+│   ├── esp32h2_stub.json              #   ESP32-H2 stub (4.1 KB)
+│   ├── esp32p4-rev1_stub.json         #   ESP32-P4 stub (5.9 KB)
+│   └── esp8266_stub.json              #   ESP8266 stub (9.5 KB)
 ├── partitions/                        # 分区表
 │   └── partitions_4mb.csv             #   4MB Flash 专用 (app 2MB + 文件系统 1.9MB)
 ├── docs/
@@ -83,9 +92,9 @@ esp32_firmware_flasher/
   |------|------|------|
   | 主机 MicroPython 固件 (app 分区) | 1.71 MB | ESP32_GENERIC v1.29.0 |
   | 内置固件 v1.29.0 | 1.71 MB | 烧到目标板用 |
-  | stub loader JSON (ESP32) | 5.0 KB | 仅保留 ESP32 stub |
+  | stub loader JSON (10 种芯片) | 65.6 KB | stub binary 数据 |
   | 源码文件 (9 个 .py) | 87.8 KB | 项目代码 |
-  | **文件系统合计** | **1.80 MB** | 上传到 ESP32 |
+  | **文件系统合计** | **1.86 MB** | 上传到 ESP32 |
   | **总 Flash 需求** | **3.56 MB** | app 2MB + 文件系统 1.8MB |
 
   | Flash 大小 | 是否够用 | 说明 |
@@ -125,8 +134,7 @@ esp32_firmware_flasher/
   storage,  data, 0x01,     0x210000, 0x1F0000,
   ```
 
-  > ⚠️ 4MB 模式下仅保留 ESP32 stub（移除了 S2/S3/C2/C3/C5/C6/H2/ESP8266 的 stub）。
-  > 检测到非 ESP32 芯片时会自动回退到 ROM 直跑（较慢但仍可烧录）。
+  > ✅ 4MB Flash 下仍保留全部 10 种芯片的 stub loader，支持多芯片自动适配。
 
 - 已烧录最新 MicroPython 固件（建议 v1.29.0 或更高）
 - 板载 LED（大多数 ESP32 开发板在 GPIO2）
