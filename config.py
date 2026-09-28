@@ -190,7 +190,6 @@ CHIP_STUB_FILES = {
 FIRMWARE_MAP = {
     13: "ESP32_GENERIC-20260824-v1.29.0.bin",   # 槽位 0: 最新稳定版
     14: "ESP32_GENERIC-20260406-v1.28.0.bin",   # 槽位 1: 上一稳定版
-    27: "ESP32_GENERIC-20251209-v1.27.0.bin",   # 槽位 2: 再上一稳定版
     26: None,                                    # 槽位 3: 保留扩展
 }
 
