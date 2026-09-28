@@ -11,7 +11,8 @@ import sys
 import struct
 
 # 复用 esptool_lite 中的 SLIP 逻辑
-sys.path.insert(0, '.')
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 
 # 手动从 esptool_lite 复制 SLIP 函数 (避免依赖 machine 模块)

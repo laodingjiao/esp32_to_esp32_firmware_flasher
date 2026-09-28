@@ -15,7 +15,8 @@ import sys
 import types
 import struct
 
-sys.path.insert(0, '.')
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 # ---- stub: utime ----
 utime_mod = types.ModuleType('utime')

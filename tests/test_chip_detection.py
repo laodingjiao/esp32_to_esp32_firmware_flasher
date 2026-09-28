@@ -20,7 +20,8 @@ import struct
 import base64
 import json
 
-sys.path.insert(0, '.')
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 # ---- stub modules ----
 sys.modules['ustruct'] = __import__('struct')
@@ -140,7 +141,7 @@ config_mod.CHIP_STUB_FILES = {
 sys.modules['config'] = config_mod
 
 import importlib.util
-spec = importlib.util.spec_from_file_location("esptool_lite", "./esptool_lite.py")
+spec = importlib.util.spec_from_file_location("esptool_lite", os.path.join(os.path.dirname(__file__), "..", "src", "esptool_lite.py"))
 etl = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(etl)
 

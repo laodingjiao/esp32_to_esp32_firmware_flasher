@@ -44,15 +44,24 @@
 ```
 esp32_firmware_flasher/
 ├── README.md                          # 本文件
-├── config.py                          # 所有可配置参数 (351 行)
-├── main.py                            # 主程序入口 (440 行)
-├── espflash.py                        # ✅ micropython-lib 官方库 (316 行, MIT)
-├── esptool_lite.py                    # StubFlasher (继承 ESPFlash) + 15 错误类 (498 行)
-├── led_state.py                       # LED 状态机 (15 种状态, 168 行)
-├── firmware_selector.py               # GPIO 选择固件 + 默认回退 (96 行)
-├── target_controller.py               # EN/BOOT 控制 + 目标板探测 (95 行)
-├── target_verifier.py                 # 烧后版本验证 (借鉴 Machiel80, 181 行)
-├── target_monitor.py                  # 烧后日志监控 (借鉴 helghast098, 138 行)
+├── .gitignore
+├── src/                               # 源码目录
+│   ├── main.py                        # 主程序入口 (440 行)
+│   ├── config.py                      # 所有可配置参数 (351 行)
+│   ├── espflash.py                    # ✅ micropython-lib 官方库 (316 行, MIT)
+│   ├── esptool_lite.py                # StubFlasher + 15 错误类 (498 行)
+│   ├── led_state.py                   # LED 状态机 (15 种状态, 168 行)
+│   ├── firmware_selector.py           # GPIO 选择固件 + 默认回退 (96 行)
+│   ├── target_controller.py           # EN/BOOT 控制 + 目标板探测 (95 行)
+│   ├── target_verifier.py             # 烧后版本验证 (借鉴 Machiel80, 181 行)
+│   └── target_monitor.py              # 烧后日志监控 (借鉴 helghast098, 138 行)
+├── tests/                             # 测试目录 (PC 上运行, 无需硬件)
+│   ├── test_slip.py                   # SLIP 协议单元测试 (7 个)
+│   ├── test_esptool_flow.py           # 架构测试 (4 个)
+│   ├── test_errors.py                 # 错误码体系测试 (8 个)
+│   ├── test_verifier.py               # 烧后验证测试 (9 个)
+│   ├── test_stub_loader.py            # stub loader 测试 (7 个)
+│   └── test_chip_detection.py         # 芯片检测测试 (14 个)
 ├── stub/                              # stub loader 目录 (10 种芯片, 88 KB)
 │   ├── esp32_stub.json                #   ESP32 stub (3.6 KB)
 │   ├── esp32s2_stub.json              #   ESP32-S2 stub (4.8 KB)
@@ -64,12 +73,6 @@ esp32_firmware_flasher/
 │   ├── esp32h2_stub.json              #   ESP32-H2 stub (4.1 KB)
 │   ├── esp32p4-rev1_stub.json         #   ESP32-P4 stub (5.9 KB)
 │   └── esp8266_stub.json              #   ESP8266 stub (9.5 KB)
-├── test_slip.py                       # SLIP 协议单元测试
-├── test_esptool_flow.py               # 架构测试 (继承关系 + 方法存在性)
-├── test_errors.py                     # 错误码体系测试 (15 个错误类)
-├── test_verifier.py                   # 烧后验证模块测试
-├── test_stub_loader.py                # stub loader 测试 (7 个场景)
-├── test_chip_detection.py             # 芯片型号检测测试 (14 个场景)
 ├── docs/
 │   └── esp32_pinout_upesy.jpg         # ESP32 完整引脚图
 └── firmware/                          # 内置固件文件目录
@@ -126,9 +129,9 @@ esptool.py --port /dev/ttyUSB0 --baud 460800 write_flash 0x0 host_firmware.bin
 
 ```bash
 pip install mpremote
-mpremote connect /dev/ttyUSB0 cp espflash.py esptool_lite.py config.py main.py \
-  led_state.py firmware_selector.py target_controller.py target_verifier.py \
-  target_monitor.py :/
+mpremote connect /dev/ttyUSB0 cp src/espflash.py src/esptool_lite.py src/config.py src/main.py \
+  src/led_state.py src/firmware_selector.py src/target_controller.py src/target_verifier.py \
+  src/target_monitor.py :/
 mpremote connect /dev/ttyUSB0 cp -r stub :/
 mpremote connect /dev/ttyUSB0 cp -r firmware :/
 ```
@@ -258,7 +261,7 @@ tool.set_baudrate(460800)                  # 切换高速 (复用 ESPFlash)
 cd esp32_firmware_flasher
 for t in test_slip test_esptool_flow test_errors test_verifier test_stub_loader test_chip_detection; do
     echo "=== $t ==="
-    python3 $t.py 2>&1 | tail -3
+    python3 tests/$t.py 2>&1 | tail -3
     echo
 done
 ```
