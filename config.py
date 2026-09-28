@@ -168,14 +168,14 @@ CHIP_ID_VALUES = {
 # 注意: 文件名必须与 STUB_LOADER_DIR 下的实际文件一致
 CHIP_STUB_FILES = {
     "esp32":         "esp32_stub.json",
-    "esp32s2":       "esp32s2_stub.json",
-    "esp32s3":       "esp32s3_stub.json",
-    "esp32c2":       "esp32c2_stub.json",
-    "esp32c3":       "esp32c3_stub.json",
-    "esp32c5":       "esp32c5_stub.json",
-    "esp32c6":       "esp32c6_stub.json",
-    "esp32h2":       "esp32h2_stub.json",
-    "esp8266":       "esp8266_stub.json",
+    # "esp32s2":       "esp32s2_stub.json",   # 4MB 精简: 已移除
+    # "esp32s3":       "esp32s3_stub.json",   # 4MB 精简: 已移除
+    # "esp32c2":       "esp32c2_stub.json",   # 4MB 精简: 已移除
+    # "esp32c3":       "esp32c3_stub.json",   # 4MB 精简: 已移除
+    # "esp32c5":       "esp32c5_stub.json",   # 4MB 精简: 已移除
+    # "esp32c6":       "esp32c6_stub.json",   # 4MB 精简: 已移除
+    # "esp32h2":       "esp32h2_stub.json",   # 4MB 精简: 已移除
+    # "esp8266":       "esp8266_stub.json",  # 4MB 精简: 已移除
     # ESP32-P4 暂无 stub (用 ROM 直跑)
     # ESP32-C61/H21/H4/S31 暂无 stub (用 ROM 直跑)
 }

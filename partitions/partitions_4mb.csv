@@ -1,0 +1,9 @@
+# 4MB Flash 自定义分区表 (app 2MB + 文件系统 1.9MB)
+# 适用于 4MB Flash 的 ESP32 开发板
+# 烧录命令: esptool.py write_flash 0x8000 partitions_4mb.csv
+
+# Name,   Type, SubType,  Offset,   Size,    Flags
+nvs,      data, nvs,      0x9000,   0x4000,
+phy_init, data, phy,      0xf000,   0x1000,
+factory,  app,  factory,  0x10000,  0x200000,
+storage,  data, 0x01,     0x210000, 0x1F0000,

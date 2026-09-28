@@ -62,17 +62,10 @@ esp32_firmware_flasher/
 │   ├── test_verifier.py               # 烧后验证测试 (9 个)
 │   ├── test_stub_loader.py            # stub loader 测试 (7 个)
 │   └── test_chip_detection.py         # 芯片检测测试 (14 个)
-├── stub/                              # stub loader 目录 (10 种芯片, 88 KB)
-│   ├── esp32_stub.json                #   ESP32 stub (3.6 KB)
-│   ├── esp32s2_stub.json              #   ESP32-S2 stub (4.8 KB)
-│   ├── esp32s3_stub.json              #   ESP32-S3 stub (6.2 KB)
-│   ├── esp32c2_stub.json              #   ESP32-C2 stub (3.7 KB)
-│   ├── esp32c3_stub.json              #   ESP32-C3 stub (4.1 KB)
-│   ├── esp32c5_stub.json              #   ESP32-C5 stub (5.4 KB)
-│   ├── esp32c6_stub.json              #   ESP32-C6 stub (4.1 KB)
-│   ├── esp32h2_stub.json              #   ESP32-H2 stub (4.1 KB)
-│   ├── esp32p4-rev1_stub.json         #   ESP32-P4 stub (5.9 KB)
-│   └── esp8266_stub.json              #   ESP8266 stub (9.5 KB)
+├── stub/                              # stub loader 目录 (ESP32 stub, 5 KB)
+│   └── esp32_stub.json                #   ESP32 stub (3.6 KB)
+├── partitions/                        # 分区表
+│   └── partitions_4mb.csv             #   4MB Flash 专用 (app 2MB + 文件系统 1.9MB)
 ├── docs/
 │   └── esp32_pinout_upesy.jpg         # ESP32 完整引脚图
 └── firmware/                          # 内置固件文件目录
@@ -82,7 +75,7 @@ esp32_firmware_flasher/
 ## 📋 硬件需求
 
 ### 主机板 (Host)
-- 1× ESP32 开发板，**≥ 8 MB Flash**（推荐 ESP32-WROOM-32E 8MB 或 ESP32-WROVER-E）
+- 1× ESP32 开发板，**≥ 4 MB Flash**（4MB 需自定义分区表，8MB+ 直接可用）
 
   **Flash 需求计算：**
 
@@ -90,16 +83,50 @@ esp32_firmware_flasher/
   |------|------|------|
   | 主机 MicroPython 固件 (app 分区) | 1.71 MB | ESP32_GENERIC v1.29.0 |
   | 内置固件 v1.29.0 | 1.71 MB | 烧到目标板用 |
-  | stub loader JSON (10 种芯片) | 65.6 KB | stub binary 数据 |
+  | stub loader JSON (ESP32) | 5.0 KB | 仅保留 ESP32 stub |
   | 源码文件 (9 个 .py) | 87.8 KB | 项目代码 |
-  | **文件系统合计** | **1.86 MB** | 上传到 ESP32 |
-  | **总 Flash 需求** | **3.56 MB** | app + 文件系统 |
+  | **文件系统合计** | **1.80 MB** | 上传到 ESP32 |
+  | **总 Flash 需求** | **3.56 MB** | app 2MB + 文件系统 1.8MB |
 
   | Flash 大小 | 是否够用 | 说明 |
   |------------|----------|------|
-  | 4 MB | ❌ 不够 | app 分区 1MB 装不下 MicroPython 1.71MB |
-  | **8 MB** | **✅ 推荐** | 剩余 4.0 MB 空间，充裕且经济 |
+  | **4 MB** | **✅ 可以** | 需自定义分区表 (app 2MB + 文件系统 1.9MB)，见下方说明 |
+  | 8 MB | ✅ 推荐 | 剩余 4.0 MB 空间，充裕且经济 |
   | 16 MB | ✅ 充裕 | 剩余 10.0 MB，适合未来扩展 |
+
+  **4MB Flash 烧录方法（需自定义分区表）：**
+
+  ```bash
+  # 1. 下载 MicroPython 固件
+  curl -L -o host_firmware.bin \
+    https://micropython.org/resources/firmware/ESP32_GENERIC-20260824-v1.29.0.bin
+
+  # 2. 生成 4MB 专用分区表二进制 (从 CSV)
+  python3 -c "
+  import sys; sys.path.insert(0, '.')
+  # 用 esptool 的 gen_esp32part.py 转换
+  " 2>/dev/null || \
+  esptool.py --chip esp32 image_partition_table \
+    partitions/partitions_4mb.csv partitions_4mb.bin
+
+  # 3. 烧录分区表 + MicroPython 固件
+  esptool.py --port /dev/ttyUSB0 --baud 460800 \
+    write_flash 0x8000 partitions_4mb.bin \
+    0x10000 host_firmware.bin
+  ```
+
+  分区表文件 `partitions/partitions_4mb.csv`：
+
+  ```
+  # Name,   Type, SubType,  Offset,   Size,    Flags
+  nvs,      data, nvs,      0x9000,   0x4000,
+  phy_init, data, phy,      0xf000,   0x1000,
+  factory,  app,  factory,  0x10000,  0x200000,
+  storage,  data, 0x01,     0x210000, 0x1F0000,
+  ```
+
+  > ⚠️ 4MB 模式下仅保留 ESP32 stub（移除了 S2/S3/C2/C3/C5/C6/H2/ESP8266 的 stub）。
+  > 检测到非 ESP32 芯片时会自动回退到 ROM 直跑（较慢但仍可烧录）。
 
 - 已烧录最新 MicroPython 固件（建议 v1.29.0 或更高）
 - 板载 LED（大多数 ESP32 开发板在 GPIO2）
