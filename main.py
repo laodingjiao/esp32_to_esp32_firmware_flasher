@@ -33,12 +33,12 @@ import utime
 import sys
 from machine import UART, Pin
 import config
-from led_state import LedStatus
-from firmware_selector import FirmwareSelector
-from target_controller import TargetController
+from esp32_led_state import LedStatus
+from esp32_firmware_selector import FirmwareSelector
+from esp32_target_controller import TargetController
 # 复用 micropython-lib 的 ESPFlash (底层协议)
 # 我们的 StubFlasher 继承 ESPFlash, 加入 stub loader + 芯片检测 + 错误码
-from esptool_lite import (
+from esp32_esptool_lite import (
     StubFlasher,
     ESPROMError,                # 基类, 捕获所有协议错误
     SyncFailed,                 # SYNC 握手失败
@@ -57,9 +57,9 @@ from esptool_lite import (
     EmptyFirmwareFile,          # 固件文件空 (FlashWriteFailed 子类)
 )
 # 借鉴 Machiel80: 烧后版本验证
-from target_verifier import TargetVerifier
+from esp32_target_verifier import TargetVerifier
 # 借鉴 helghast098: 烧后日志监控
-from target_monitor import TargetMonitor
+from esp32_target_monitor import TargetMonitor
 
 
 # ============================================================================

@@ -16,7 +16,7 @@ import types
 import struct
 
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 # ---- stub: utime ----
 utime_mod = types.ModuleType('utime')
@@ -45,7 +45,7 @@ machine_mod = types.ModuleType('machine')
 sys.modules['machine'] = machine_mod
 
 # 现在可以 import 被测模块
-import target_verifier
+import esp32_target_verifier as target_verifier
 
 
 class MockUART:

@@ -27,11 +27,11 @@ import ubinascii
 import ujson
 import config
 # 复用 micropython-lib 官方模块
-from espflash import ESPFlash, _CMD_SYNC, _CMD_CHANGE_BAUDRATE
-from espflash import _CMD_ESP_READ_REG
+from esp32_espflash import ESPFlash, _CMD_SYNC, _CMD_CHANGE_BAUDRATE
+from esp32_espflash import _CMD_ESP_READ_REG
 # 新增: espflash 没有 MEM 命令常量和 GET_SECURITY_INFO, 我们自己定义
-from espflash import _CMD_SPI_FLASH_BEGIN, _CMD_SPI_FLASH_DATA, _CMD_SPI_FLASH_END
-from espflash import _CMD_SPI_FLASH_MD5
+from esp32_espflash import _CMD_SPI_FLASH_BEGIN, _CMD_SPI_FLASH_DATA, _CMD_SPI_FLASH_END
+from esp32_espflash import _CMD_SPI_FLASH_MD5
 
 
 # ============================================================================

@@ -45,16 +45,15 @@
 esp32_firmware_flasher/
 ├── README.md                          # 本文件
 ├── .gitignore
-├── main.py                            # 主程序入口 (440 行) — MicroPython 自动运行
-├── config.py                          # 所有可配置参数 (351 行)
-├── src/                               # 源码目录 (上传时复制到 ESP32 根目录)
-│   ├── espflash.py                    # ✅ micropython-lib 官方库 (316 行, MIT)
-│   ├── esptool_lite.py                # StubFlasher + 15 错误类 (498 行)
-│   ├── led_state.py                   # LED 状态机 (15 种状态, 168 行)
-│   ├── firmware_selector.py           # GPIO 选择固件 + 默认回退 (96 行)
-│   ├── target_controller.py           # EN/BOOT 控制 + 目标板探测 (95 行)
-│   ├── target_verifier.py             # 烧后版本验证 (借鉴 Machiel80, 181 行)
-│   └── target_monitor.py              # 烧后日志监控 (借鉴 helghast098, 138 行)
+├── main.py                            # 主程序入口 — MicroPython 自动运行
+├── config.py                          # 所有可配置参数
+├── esp32_espflash.py                  # ✅ micropython-lib 官方库 (MIT)
+├── esp32_esptool_lite.py              # StubFlasher + 15 错误类
+├── esp32_led_state.py                 # LED 状态机 (15 种状态)
+├── esp32_firmware_selector.py         # GPIO 选择固件 + 默认回退
+├── esp32_target_controller.py         # EN/BOOT 控制 + 目标板探测
+├── esp32_target_verifier.py           # 烧后版本验证 (借鉴 Machiel80)
+├── esp32_target_monitor.py            # 烧后日志监控 (借鉴 helghast098)
 ├── tests/                             # 测试目录 (PC 上运行, 无需硬件)
 │   ├── test_slip.py                   # SLIP 协议单元测试 (7 个)
 │   ├── test_esptool_flow.py           # 架构测试 (4 个)
@@ -62,7 +61,7 @@ esp32_firmware_flasher/
 │   ├── test_verifier.py               # 烧后验证测试 (9 个)
 │   ├── test_stub_loader.py            # stub loader 测试 (7 个)
 │   └── test_chip_detection.py         # 芯片检测测试 (14 个)
-├── stub/                              # stub loader 目录 (10 种芯片, 66 KB)
+├── stub/                              # stub loader 目录 (10 种芯片)
 │   ├── esp32_stub.json                #   ESP32 stub (3.6 KB)
 │   ├── esp32s2_stub.json              #   ESP32-S2 stub (4.8 KB)
 │   ├── esp32s3_stub.json              #   ESP32-S3 stub (6.2 KB)
@@ -82,30 +81,7 @@ esp32_firmware_flasher/
 ## 📋 硬件需求
 
 ### 主机板 (Host)
-- 1× ESP32 开发板，**≥ 4 MB Flash**（4MB 需自定义分区表，8MB+ 直接可用）
-
-  **Flash 需求计算：**
-
-  | 组成 | 大小 | 说明 |
-  |------|------|------|
-  | 主机 MicroPython 固件 (app 分区) | 1.71 MB | ESP32_GENERIC v1.29.0 |
-  | 内置固件 v1.29.0 | 1.71 MB | 烧到目标板用 |
-  | stub loader JSON (10 种芯片) | 65.6 KB | stub binary 数据 |
-  | 源码文件 (9 个 .py) | 87.8 KB | 项目代码 |
-  | **文件系统合计** | **1.86 MB** | 上传到 ESP32 (4MB 板可用 2.0MB) |
-  | **总 Flash 需求** | **3.56 MB** | app 2MB + 文件系统 1.8MB |
-
-  | Flash 大小 | 是否够用 | 说明 |
-  |------------|----------|------|
-  | **4 MB** | **✅ 可以** | MicroPython 自带分区表 (app 1.84MB + 文件系统 2.0MB)，直接烧即可 |
-  | 8 MB | ✅ 推荐 | 剩余空间更大，适合未来扩展 |
-  | 16 MB | ✅ 充裕 | 剩余空间充裕 |
-
-  > MicroPython 官方固件 ESP32_GENERIC 已自带 4MB+ 分区表 (partitions-4MiBplus.csv)：
-  > factory (app) = 1.84MB (固件 1.71MB 装得下) + 文件系统 = 2.0MB (需要 1.86MB)。
-  > **4MB 板直接烧 MicroPython 固件即可，无需额外操作。**
-
-- 已烧录最新 MicroPython 固件（建议 v1.29.0 或更高）
+- 1× ESP32 开发板（4MB+ Flash，烧录 MicroPython v1.29.0 或更高）
 - 板载 LED（大多数 ESP32 开发板在 GPIO2）
 
 ### 目标板 (Target)
@@ -128,8 +104,8 @@ esp32_firmware_flasher/
 | GPIO | 跳线到 3V3 后烧入固件                    |
 |------|-------------------------------------------|
 | 13   | `ESP32_GENERIC-20260824-v1.29.0.bin`     |
-| 14   | `ESP32_GENERIC-20260406-v1.28.0.bin`      |
-| 27   | `ESP32_GENERIC-20251209-v1.27.0.bin`      |
+| 14   | （保留槽位，可在 `config.py` 配置）        |
+| 27   | （保留槽位，可在 `config.py` 配置）        |
 | 26   | （保留槽位，可在 `config.py` 配置）        |
 
 > ⚠️ 同一时刻只允许一个 GPIO 被跳线到 3V3。不接任何跳线时自动用 v1.29.0 最新版。
@@ -149,15 +125,12 @@ esptool.py --port /dev/ttyUSB0 --baud 460800 write_flash 0x0 host_firmware.bin
 
 ```bash
 pip install mpremote
-# main.py 和 config.py 在根目录 (MicroPython 自动运行)
-mpremote connect /dev/ttyUSB0 cp main.py config.py :/
-# src/ 下的模块也上传到 ESP32 根目录
-mpremote connect /dev/ttyUSB0 cp src/espflash.py src/esptool_lite.py \
-  src/led_state.py src/firmware_selector.py \
-  src/target_controller.py src/target_verifier.py src/target_monitor.py :/
+mpremote connect /dev/ttyUSB0 cp main.py config.py \
+  esp32_espflash.py esp32_esptool_lite.py esp32_led_state.py \
+  esp32_firmware_selector.py esp32_target_controller.py \
+  esp32_target_verifier.py esp32_target_monitor.py :/
 mpremote connect /dev/ttyUSB0 cp -r stub :/
 mpremote connect /dev/ttyUSB0 cp -r firmware :/
-```
 ```
 
 ### 第 3 步：接线 + 选择固件

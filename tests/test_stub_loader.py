@@ -21,8 +21,7 @@ import base64
 import json
 
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 # ---- stub modules ----
 sys.modules['ustruct'] = __import__('struct')
@@ -125,7 +124,7 @@ sys.modules['config'] = config_mod
 
 # 加载被测模块
 import importlib.util
-spec = importlib.util.spec_from_file_location("esptool_lite", os.path.join(os.path.dirname(__file__), "..", "src", "esptool_lite.py"))
+spec = importlib.util.spec_from_file_location("esptool_lite", os.path.join(os.path.dirname(__file__), "..", "esp32_esptool_lite.py"))
 etl = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(etl)
 

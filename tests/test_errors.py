@@ -25,8 +25,7 @@ import types
 import json
 
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 # 手动加载 esptool_lite.py, stub 掉 ustruct/uhashlib/ubinascii/machine
 # (本测试只关心错误类定义, 不需要这些模块)
@@ -76,14 +75,14 @@ sys.modules['machine'] = machine_mod
 
 # 用 importlib 加载, 跳过顶部的 micro 导入
 spec = importlib.util.spec_from_file_location(
-    "esptool_lite", os.path.join(os.path.dirname(__file__), "..", "src", "esptool_lite.py")
+    "esp32_esptool_lite", os.path.join(os.path.dirname(__file__), "..", "esp32_esptool_lite.py")
 )
 esptool_lite = importlib.util.module_from_spec(spec)
 # 因为 stub 已注入 sys.modules, 顶部的 import ustruct 等会成功
 spec.loader.exec_module(esptool_lite)
 
 
-from esptool_lite import (
+from esp32_esptool_lite import (
     ESPROMError,
     SyncFailed, CommandTimeout, BadResponse,
     InvalidChecksum, InvalidParam,

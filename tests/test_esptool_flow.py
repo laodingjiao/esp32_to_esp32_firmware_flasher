@@ -19,8 +19,7 @@ import json
 import base64
 
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 # ---- stub modules ----
 sys.modules['ustruct'] = __import__('struct')
@@ -90,7 +89,7 @@ config_mod.CHIP_STUB_FILES = {"esp32": "esp32_stub.json"}
 sys.modules['config'] = config_mod
 
 import importlib.util
-spec = importlib.util.spec_from_file_location("esptool_lite", os.path.join(os.path.dirname(__file__), "..", "src", "esptool_lite.py"))
+spec = importlib.util.spec_from_file_location("esptool_lite", os.path.join(os.path.dirname(__file__), "..", "esp32_esptool_lite.py"))
 etl = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(etl)
 
@@ -99,7 +98,7 @@ def test_stub_flasher_class_exists():
     """StubFlasher 类存在且继承 ESPFlash."""
     print("--- test_stub_flasher_class_exists ---")
     assert hasattr(etl, 'StubFlasher'), "StubFlasher class not found"
-    import espflash
+    import esp32_espflash as espflash
     assert issubclass(etl.StubFlasher, espflash.ESPFlash), \
         "StubFlasher should inherit from ESPFlash"
     print("PASS: StubFlasher inherits ESPFlash")
@@ -132,7 +131,7 @@ def test_stub_loader_methods_exist():
 def test_espflash_methods_inherited():
     """ESPFlash 的方法被 StubFlasher 继承."""
     print("--- test_espflash_methods_inherited ---")
-    import espflash
+    import esp32_espflash as espflash
     inherited = ['bootloader', 'flash_write_file', 'flash_verify_file',
                  'flash_attach', 'flash_config', 'flash_read_size',
                  'set_baudrate', 'reboot', '_command', '_read_slip', '_write_slip']
