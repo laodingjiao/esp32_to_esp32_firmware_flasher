@@ -76,8 +76,7 @@ esp32_firmware_flasher/
 ├── docs/
 │   └── esp32_pinout_upesy.jpg         # ESP32 完整引脚图
 └── firmware/                          # 内置固件文件目录
-    ├── ESP32_GENERIC-20260824-v1.29.0.bin   # ~1.71 MB（最新稳定版）
-    └── ESP32_GENERIC-20260406-v1.28.0.bin   # ~1.68 MB
+    └── ESP32_GENERIC-20260824-v1.29.0.bin   # ~1.71 MB（最新稳定版）
 ```
 
 ## 📋 硬件需求
@@ -91,17 +90,16 @@ esp32_firmware_flasher/
   |------|------|------|
   | 主机 MicroPython 固件 (app 分区) | 1.71 MB | ESP32_GENERIC v1.29.0 |
   | 内置固件 v1.29.0 | 1.71 MB | 烧到目标板用 |
-  | 内置固件 v1.28.0 | 1.68 MB | 烧到目标板用 |
   | stub loader JSON (10 种芯片) | 65.6 KB | stub binary 数据 |
   | 源码文件 (9 个 .py) | 87.8 KB | 项目代码 |
-  | **文件系统合计** | **3.54 MB** | 上传到 ESP32 |
-  | **总 Flash 需求** | **5.24 MB** | app + 文件系统 |
+  | **文件系统合计** | **1.86 MB** | 上传到 ESP32 |
+  | **总 Flash 需求** | **3.56 MB** | app + 文件系统 |
 
   | Flash 大小 | 是否够用 | 说明 |
   |------------|----------|------|
   | 4 MB | ❌ 不够 | app 分区 1MB 装不下 MicroPython 1.71MB |
-  | **8 MB** | **✅ 推荐** | 剩余 2.3 MB 空间，够用且经济 |
-  | 16 MB | ✅ 充裕 | 剩余 8.3 MB，适合未来扩展 |
+  | **8 MB** | **✅ 推荐** | 剩余 4.0 MB 空间，充裕且经济 |
+  | 16 MB | ✅ 充裕 | 剩余 10.0 MB，适合未来扩展 |
 
 - 已烧录最新 MicroPython 固件（建议 v1.29.0 或更高）
 - 板载 LED（大多数 ESP32 开发板在 GPIO2）

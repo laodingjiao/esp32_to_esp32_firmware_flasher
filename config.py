@@ -189,7 +189,7 @@ CHIP_STUB_FILES = {
 # 留 None 表示该槽位保留 (跳线后报 "no firmware" 错误).
 FIRMWARE_MAP = {
     13: "ESP32_GENERIC-20260824-v1.29.0.bin",   # 槽位 0: 最新稳定版
-    14: "ESP32_GENERIC-20260406-v1.28.0.bin",   # 槽位 1: 上一稳定版
+    14: None,                                    # 槽位 1: 保留扩展
     26: None,                                    # 槽位 3: 保留扩展
 }
 
