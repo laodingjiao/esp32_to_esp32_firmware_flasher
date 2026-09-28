@@ -26,6 +26,7 @@ import json
 
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 # 手动加载 esptool_lite.py, stub 掉 ustruct/uhashlib/ubinascii/machine
 # (本测试只关心错误类定义, 不需要这些模块)
