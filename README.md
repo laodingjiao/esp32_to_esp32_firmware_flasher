@@ -45,9 +45,9 @@
 esp32_firmware_flasher/
 ├── README.md                          # 本文件
 ├── .gitignore
-├── src/                               # 源码目录
-│   ├── main.py                        # 主程序入口 (440 行)
-│   ├── config.py                      # 所有可配置参数 (351 行)
+├── main.py                            # 主程序入口 (440 行) — MicroPython 自动运行
+├── config.py                          # 所有可配置参数 (351 行)
+├── src/                               # 源码目录 (上传时复制到 ESP32 根目录)
 │   ├── espflash.py                    # ✅ micropython-lib 官方库 (316 行, MIT)
 │   ├── esptool_lite.py                # StubFlasher + 15 错误类 (498 行)
 │   ├── led_state.py                   # LED 状态机 (15 种状态, 168 行)
@@ -79,6 +79,7 @@ esp32_firmware_flasher/
     ├── ESP32_GENERIC-20260824-v1.29.0.bin   # ~1.71 MB（最新稳定版）
     ├── ESP32_GENERIC-20260406-v1.28.0.bin   # ~1.68 MB
     └── ESP32_GENERIC-20251209-v1.27.0.bin   # ~1.68 MB
+```
 ```
 
 ## 📋 硬件需求
@@ -129,11 +130,15 @@ esptool.py --port /dev/ttyUSB0 --baud 460800 write_flash 0x0 host_firmware.bin
 
 ```bash
 pip install mpremote
-mpremote connect /dev/ttyUSB0 cp src/espflash.py src/esptool_lite.py src/config.py src/main.py \
-  src/led_state.py src/firmware_selector.py src/target_controller.py src/target_verifier.py \
-  src/target_monitor.py :/
+# main.py 和 config.py 在根目录 (MicroPython 自动运行)
+mpremote connect /dev/ttyUSB0 cp main.py config.py :/
+# src/ 下的模块也上传到 ESP32 根目录
+mpremote connect /dev/ttyUSB0 cp src/espflash.py src/esptool_lite.py \
+  src/led_state.py src/firmware_selector.py \
+  src/target_controller.py src/target_verifier.py src/target_monitor.py :/
 mpremote connect /dev/ttyUSB0 cp -r stub :/
 mpremote connect /dev/ttyUSB0 cp -r firmware :/
+```
 ```
 
 ### 第 3 步：接线 + 选择固件
