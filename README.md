@@ -73,8 +73,6 @@ esp32_firmware_flasher/
 │   ├── esp32h2_stub.json              #   ESP32-H2 stub (4.1 KB)
 │   ├── esp32p4-rev1_stub.json         #   ESP32-P4 stub (5.9 KB)
 │   └── esp8266_stub.json              #   ESP8266 stub (9.5 KB)
-├── partitions/                        # 分区表
-│   └── partitions_4mb.csv             #   4MB Flash 专用 (app 2MB + 文件系统 1.9MB)
 ├── docs/
 │   └── esp32_pinout_upesy.jpg         # ESP32 完整引脚图
 └── firmware/                          # 内置固件文件目录
@@ -94,47 +92,18 @@ esp32_firmware_flasher/
   | 内置固件 v1.29.0 | 1.71 MB | 烧到目标板用 |
   | stub loader JSON (10 种芯片) | 65.6 KB | stub binary 数据 |
   | 源码文件 (9 个 .py) | 87.8 KB | 项目代码 |
-  | **文件系统合计** | **1.86 MB** | 上传到 ESP32 |
+  | **文件系统合计** | **1.86 MB** | 上传到 ESP32 (4MB 板可用 2.0MB) |
   | **总 Flash 需求** | **3.56 MB** | app 2MB + 文件系统 1.8MB |
 
   | Flash 大小 | 是否够用 | 说明 |
   |------------|----------|------|
-  | **4 MB** | **✅ 可以** | 需自定义分区表 (app 2MB + 文件系统 1.9MB)，见下方说明 |
-  | 8 MB | ✅ 推荐 | 剩余 4.0 MB 空间，充裕且经济 |
-  | 16 MB | ✅ 充裕 | 剩余 10.0 MB，适合未来扩展 |
+  | **4 MB** | **✅ 可以** | MicroPython 自带分区表 (app 1.84MB + 文件系统 2.0MB)，直接烧即可 |
+  | 8 MB | ✅ 推荐 | 剩余空间更大，适合未来扩展 |
+  | 16 MB | ✅ 充裕 | 剩余空间充裕 |
 
-  **4MB Flash 烧录方法（需自定义分区表）：**
-
-  ```bash
-  # 1. 下载 MicroPython 固件
-  curl -L -o host_firmware.bin \
-    https://micropython.org/resources/firmware/ESP32_GENERIC-20260824-v1.29.0.bin
-
-  # 2. 生成 4MB 专用分区表二进制 (从 CSV)
-  python3 -c "
-  import sys; sys.path.insert(0, '.')
-  # 用 esptool 的 gen_esp32part.py 转换
-  " 2>/dev/null || \
-  esptool.py --chip esp32 image_partition_table \
-    partitions/partitions_4mb.csv partitions_4mb.bin
-
-  # 3. 烧录分区表 + MicroPython 固件
-  esptool.py --port /dev/ttyUSB0 --baud 460800 \
-    write_flash 0x8000 partitions_4mb.bin \
-    0x10000 host_firmware.bin
-  ```
-
-  分区表文件 `partitions/partitions_4mb.csv`：
-
-  ```
-  # Name,   Type, SubType,  Offset,   Size,    Flags
-  nvs,      data, nvs,      0x9000,   0x4000,
-  phy_init, data, phy,      0xf000,   0x1000,
-  factory,  app,  factory,  0x10000,  0x200000,
-  storage,  data, 0x01,     0x210000, 0x1F0000,
-  ```
-
-  > ✅ 4MB Flash 下仍保留全部 10 种芯片的 stub loader，支持多芯片自动适配。
+  > MicroPython 官方固件 ESP32_GENERIC 已自带 4MB+ 分区表 (partitions-4MiBplus.csv)：
+  > factory (app) = 1.84MB (固件 1.71MB 装得下) + 文件系统 = 2.0MB (需要 1.86MB)。
+  > **4MB 板直接烧 MicroPython 固件即可，无需额外操作。**
 
 - 已烧录最新 MicroPython 固件（建议 v1.29.0 或更高）
 - 板载 LED（大多数 ESP32 开发板在 GPIO2）
